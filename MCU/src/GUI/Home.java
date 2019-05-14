@@ -1,22 +1,62 @@
-
 package GUI;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import javax.swing.DefaultListModel;
 
-
 public class Home extends javax.swing.JFrame {
-    
-    private DefaultListModel heroes = new DefaultListModel();
-    private DefaultListModel movies = new DefaultListModel();
 
-   
+    private DefaultListModel heroesDlm = new DefaultListModel();
+    private DefaultListModel moviesDlm = new DefaultListModel();
+
+    private static File characters = new File(".\\heroes.csv");
+    private static File chInfo = new File(".\\heroes_info.csv");
+    private static File movies = new File(".\\mcu_movies.csv");
+
     public Home() {
         initComponents();
-        listSuper.setModel(heroes);
-        listMovies.setModel(movies);
+        listSuper.setModel(heroesDlm);
+        listMovies.setModel(moviesDlm);
+
+        fillLists();
     }
 
-    
+    public void fillLists() {
+
+        // add heroes to the list
+        try (BufferedReader br = new BufferedReader(new FileReader(characters))) {
+            String s = "";
+            String[] split;
+            br.readLine();
+            while ((s = br.readLine()) != null) {
+                split = s.split(",");
+                heroesDlm.addElement(split[1]);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // add movies to the list
+        try (BufferedReader br = new BufferedReader(new FileReader(movies))) {
+            String s = "";
+            String[] split;
+
+            br.readLine();
+            while ((s = br.readLine()) != null) {
+                split = s.split(",");
+                moviesDlm.addElement(split[0]);
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
