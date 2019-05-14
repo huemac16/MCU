@@ -25,7 +25,7 @@ public class Home extends javax.swing.JFrame {
     public void fillLists() {
 
         // add heroes to the list
-        try (BufferedReader br = new BufferedReader(new FileReader(characters))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(chInfo))) {
             String s = "";
             String[] split;
             br.readLine();
@@ -67,6 +67,10 @@ public class Home extends javax.swing.JFrame {
         lbMovies = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         listMovies = new javax.swing.JList<>();
+        tfSearch = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        taInfo = new javax.swing.JTextArea();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,6 +80,11 @@ public class Home extends javax.swing.JFrame {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
+        });
+        listSuper.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                listSuperValueChanged(evt);
+            }
         });
         jScrollPane1.setViewportView(listSuper);
 
@@ -88,19 +97,38 @@ public class Home extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(listMovies);
 
+        tfSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tfSearchKeyReleased(evt);
+            }
+        });
+
+        taInfo.setColumns(20);
+        taInfo.setRows(5);
+        jScrollPane3.setViewportView(taInfo);
+
+        jLabel1.setText("Info");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(lbSuperheroes, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(62, 62, 62)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(tfSearch)))
+                .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbMovies, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 370, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbMovies, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(26, 26, 26)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 47, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -109,16 +137,86 @@ public class Home extends javax.swing.JFrame {
                     .addComponent(lbSuperheroes, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(7, 7, 7)
-                        .addComponent(lbMovies, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lbMovies, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel1))))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 428, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 391, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tfSearchKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfSearchKeyReleased
+        heroesDlm.clear();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(chInfo))) {
+            String s = "";
+            String[] split;
+
+            br.readLine();
+            while ((s = br.readLine()) != null) {
+                if (s.toLowerCase().contains(tfSearch.getText().toLowerCase())) {
+                    split = s.split(",");
+                    heroesDlm.addElement(split[1]);
+                }
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_tfSearchKeyReleased
+
+    private void listSuperValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listSuperValueChanged
+        taInfo.setText(null);
+        String selected = listSuper.getSelectedValue();
+        String info = "";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(chInfo))) {
+            String s = "";
+            String[] split;
+
+            while ((s = br.readLine()) != null) {
+                split = s.split(",");
+                if (split[1].equals(selected)) {
+                    info = s;
+                }
+            }
+
+        } catch (Exception e) {
+        }
+        
+        String[] infoSplit = info.split(",");
+
+        taInfo.setText(String.format("NAME: %s\n"
+                + "GENDER: %s\n"
+                + "EYE-COLOR: %s\n"
+                + "RACE: %s\n"
+                + "HAIR-COLOR: %s\n"
+                + "PUBLISHER: %s\n"
+                + "SKIN-COLOR: %s\n"
+                + "HEIGHT: %s\n"
+                + "WEIGHT: %s\n", infoSplit[1],
+                infoSplit[3],
+                infoSplit[4],
+                infoSplit[5],
+                infoSplit[6],
+                infoSplit[7],
+                infoSplit[8],
+                infoSplit[9],
+                infoSplit[10]));
+    }//GEN-LAST:event_listSuperValueChanged
 
     /**
      * @param args the command line arguments
@@ -156,11 +254,15 @@ public class Home extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel lbMovies;
     private javax.swing.JLabel lbSuperheroes;
     private javax.swing.JList<String> listMovies;
     private javax.swing.JList<String> listSuper;
+    private javax.swing.JTextArea taInfo;
+    private javax.swing.JTextField tfSearch;
     // End of variables declaration//GEN-END:variables
 }
